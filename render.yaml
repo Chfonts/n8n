@@ -1,16 +1,33 @@
-services:
+		services:
   - type: web
     name: n8n-puppeteer
-    env: docker
-    repo: https://github.com/chfonts/n8n-puppeteer
-    branch: main
-    dockerfilePath: ./Dockerfile
+    env: node
     plan: starter
+    buildCommand: |
+      apt-get update && apt-get install -y \
+        chromium \
+        fonts-liberation \
+        libappindicator3-1 \
+        libasound2 \
+        libatk-bridge2.0-0 \
+        libatk1.0-0 \
+        libcups2 \
+        libdbus-1-3 \
+        libgdk-pixbuf2.0-0 \
+        libnspr4 \
+        libnss3 \
+        libx11-xcb1 \
+        libxcomposite1 \
+        libxdamage1 \
+        libxrandr2 \
+        xdg-utils \
+        --no-install-recommends \
+        && rm -rf /var/lib/apt/lists/*
+      npm install -g pnpm
+      pnpm install
+      pnpm build
+    startCommand: pnpm start
     envVars:
-      - key: N8N_HOST
-        value: 0.0.0.0
-      - key: N8N_PORT
-        value: 5678
       - key: N8N_BASIC_AUTH_ACTIVE
         value: "true"
       - key: N8N_BASIC_AUTH_USER
@@ -19,3 +36,8 @@ services:
         value: KOdHXweFYwOcnLra8Z3WPJYnfFMtvRnJ
       - key: N8N_ENCRYPTION_KEY
         value: utvn3JfusitkERRYu86YFxJ4N3DYKLhPPnRXQxfkc7yaDwgr2ZBq2wNULA0MXzPy
+      - key: CHROME_BIN
+        value: "/usr/bin/chromium"
+      - key: NODE_OPTIONS
+        value: "--max_old_space_size=2048"
+    autoDeploy: true

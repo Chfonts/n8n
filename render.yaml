@@ -2,7 +2,7 @@
   - type: web
     name: n8n-puppeteer
     env: node
-    plan: starter
+    plan: standard
     buildCommand: |
       apt-get update && apt-get install -y \
         chromium \
@@ -20,6 +20,12 @@
         libxcomposite1 \
         libxdamage1 \
         libxrandr2 \
+				gconf-service \
+        libdrm-dev \
+        libgconf-2-4 \
+        libgtk-3-0 \
+        libxss1 \
+        libxtst6 \
         xdg-utils \
         --no-install-recommends \
         && rm -rf /var/lib/apt/lists/*
@@ -39,5 +45,17 @@
       - key: CHROME_BIN
         value: "/usr/bin/chromium"
       - key: NODE_OPTIONS
-        value: "--max_old_space_size=8192"
+        value: "--max_old_space_size=1900"
+
+# Ajoute des variables pour n8n afin de passer les arguments à Puppeteer/Chromium,
+      # notamment pour le no-sandbox qui est souvent nécessaire dans des environnements conteneurisés.
+      - key: N8N_NODE_DEFAULT_BINARY_PATH # Nouveau, peut aider n8n à trouver Chromium
+        value: "/usr/bin/chromium" # Ou /usr/bin/chromium-browser ou /usr/bin/google-chrome
+
+      - key: N8N_ENGINE_CHROMIUM_ARGS # Nouveau, pour passer des arguments à Chromium
+        value: "--no-sandbox --disable-setuid-sandbox" # Très important pour les conteneurs
+
+      - key: N8N_PROCESS_MAIN_ARGS # Nouveau, pour s'assurer que n8n utilise ces arguments
+        value: "--max-http-header-size=1048576" # Exemple: peut aider avec de gros headers
+		
     autoDeploy: true

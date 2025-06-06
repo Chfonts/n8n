@@ -39,5 +39,5 @@
       - key: CHROME_BIN
         value: "/usr/bin/chromium"
       - key: NODE_OPTIONS
-        value: "--max_old_space_size=2048"
+        value: "--max_old_space_size=8192"
     autoDeploy: true
